@@ -1,31 +1,97 @@
 
-# IBIS
+# IBIS (Intelligent Big data Integration System)
 
-## Get your data in the Lake!
+## Introduction
 
-IBIS is a workflow creation-engine that abstracts the Hadoop internals of ingesting RDBMS data.
-<br>![Ibis Logo](/docs/ibis_wo_logo.png)
+IBIS is a powerful workflow creation-engine that simplifies the process of ingesting RDBMS data into Hadoop environments. It abstracts the complex Hadoop internals, making data integration more accessible and efficient.
 
-All you need to do is create a request file containing information about a table that you want to query,
-and IBIS will:
-1. manage the information required to create the workflow;
-2. generate Oozie workflows, following current ingestion processes and standards to make the ingestion as performant as possible;
-3. creates file that simplify the scheduling of the job through automation; and
-4. allow easy execution of the workflow to populate the Data Lake of the RDBMS source
-
-The IBIS framework wraps the Hadoop stack technology Oozie, an XML-based workflow scheduler
-system used to manage Apache Hadoop jobs (Oozie Workflow jobs are Directed
-Acyclical Graphs (DAGs) of actions).
-
-We support creating "config-based" workflows from any of the standard Oozie
-actions - such as Hive, Shell and Impala. The main use of IBIS is to
-use SQOOP for efficiently transferring bulk data between Apache Hadoop and
-structured datastores such as relational databases (including Oracle, Teradata,
-SQL Server, and DB2).
-
-### Refer here on [How to setup IBIS?](/docs/setup_ibis.md)
+![Ibis Logo](/docs/ibis_wo_logo.png)
 
 ## Purpose
+
+IBIS addresses the challenges of creating XMLs for data integration processes, which can be time-consuming and error-prone. It automates various steps, including:
+
+- Converting Avro to Parquet
+- Validating datasets
+- Writing to checks & balances tables for auditing
+- Making views accessible to users
+- Creating backups of previous load data
+
+With IBIS, users only need to provide a single configuration file (the "Request file") to manage these complex processes.
+
+## Key Features
+
+1. **Automated Workflow Generation**: IBIS automatically creates XML workflows, eliminating the need for manual XML creation.
+2. **Split By Functionality**: Provides automated split by for Teradata, SQL Server, and DB2.
+3. **Non-ingestion Workflow Generation**: Creates Oozie workflows from Hive and shell scripts.
+4. **Schedule-based Grouping**: Groups workflows into subworkflows based on schedules for efficient automation.
+5. **Parquet Storage**: Utilizes Parquet for efficient storage and fast queries.
+6. **Lambda Architecture**: Stores data in the base layer as immutable data.
+7. **Data Export**: Allows data export to various RDBMS systems (Oracle, DB2, SQL Server, MySQL, Teradata).
+8. **Incremental Workflows**: Supports automated incremental data ingestion based on specified columns.
+9. **Data Validation**: Performs row counts, DDL matching, and data sampling, storing results in a QA log table.
+10. **Data Type Mapping**: Matches external data types to appropriate Hadoop data types.
+11. **Isolated Environments**: Provides separate team spaces for source tables, allowing independent workflow generation and scheduling.
+
+## How It Works
+
+1. Create a request file with table information.
+2. IBIS manages the workflow creation information.
+3. IBIS generates Oozie workflows following current ingestion processes and standards.
+4. IBIS creates files to simplify job scheduling through automation.
+5. Execute the workflow to populate the Data Lake with RDBMS source data.
+
+## Architecture
+
+![IBIS Architecture](/resources/ibis-arc.png?raw=true)
+
+## Setup
+
+For detailed setup instructions, please refer to the [IBIS Setup Guide](/docs/setup_ibis.md).
+
+## Usage
+
+IBIS provides a command-line interface for various operations. Use the `--help` command to list all available functionalities:
+
+```
+./ibis-shell --help
+```
+
+For detailed usage instructions and examples, please refer to the [IBIS Features Documentation](/docs/ibis_features.md).
+
+## Running Unit Tests
+
+To ensure reliability and consistency, run the unit tests using:
+
+```
+python ibis_test_suite.py
+```
+
+## Contributing
+
+We welcome contributions to the IBIS project. Please follow these steps to contribute:
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## Resources
+
+- [Source Code](https://github.com/Cigna/ibis)
+- [Issue Tracker](https://github.com/Cigna/ibis/issues)
+
+## Contributors
+
+- Matthew Wood
+- Bhaskar Teja Yerneni
+- Mohammad Quraishi
+- IBIS logo artwork by Sam Menza
+
+## License
+
+This project is licensed under the Apache 2 License. See the [LICENSE](LICENSE) file for details.
 
 Creating XMLs is a painful process, especially when including many other steps
 in the process, such as converting Avro to Parquet, validating data sets,
@@ -37,25 +103,31 @@ load's data, in case somethign goes wrong.
 IBIS takes care of all of this for you, with the user's input being only one
 single configuration file, also called the "Request file".
 
-## What does IBIS provide?
+## Detailed Functionality
 
-| What | Function  | How is this useful?  |
-| :---:   | :-: | :-: |
-Split by | Provides an automated split by for Teradata, SQL Server, and DB2 | Without the automated split by, on a per table basis, you need to find a column that enables parallel execution of an ingestion
-Auto generating Oozie workflows |	Automatically creates XML workflows |	No manual XML creation
-Generate non ingestion workflows through "building blocks" |	Given hive and shell scripts, IBIS generates oozie workflow	| Automate running any type of script in the Data Lake
-Group tables based on schedule	| Group workflows into subworkflows based on schedule |	Tables with similar schedule can be kicked off using Automation by triggering one workflow.
-Use Parquet |	Store data in Parquet |	Efficient storage + fast queries!
-Follows Lambda Architecture	| Storing data in the base layer, as immutable data
-Allows for data export to any RDBMS	|   Allows to export data from hive to oracle, db2, sqlserver, mysql, Teradata | For generating reports based on exported data to RDBMS
-Creates automated incremental workflows |	Allows you to incrementally ingest data	| Based on a column, generate a where clause data ingestion that will ingest into partitions automatically
-Data validation |	Validate the data was ingested correctly|	Row counts, DDL match, data sampling and stores info in a QA log table
-Map data types to valid Hadoop types|	Match, as close as possible, external data types to Hadoop data types|	Oracle has specific data types like NUMBER which don't exist in Hadoop. Map to a valid Hadoop type as best as possible (eg to DECIMAL) by grabbing from metadata tables. Other tools map everything directly as string - doesn't work for SAS!
-Isolated Env - custom ENV |Every different team is having separate team space for all source tables. Workflows can be generated and scheduled without affecting any team.
+IBIS provides a wide range of functionalities to simplify data integration processes:
 
-## Functionalities available in IBIS
-Command --help would list the IBIS Functionalities
- [./ibis-shell --help](/docs/help.md)
+1. **Split By**: Automated split for Teradata, SQL Server, and DB2, enabling parallel execution of ingestion without manual column selection.
+2. **Auto-generating Oozie Workflows**: Creates XML workflows automatically, eliminating manual XML creation.
+3. **Non-ingestion Workflows**: Generates Oozie workflows from Hive and shell scripts, automating various data lake operations.
+4. **Schedule-based Grouping**: Groups workflows into subworkflows based on schedules, enabling efficient automation.
+5. **Parquet Storage**: Utilizes Parquet for efficient storage and fast queries.
+6. **Lambda Architecture**: Implements Lambda Architecture, storing data in the base layer as immutable data.
+7. **Data Export**: Supports data export from Hive to Oracle, DB2, SQL Server, MySQL, and Teradata for report generation.
+8. **Incremental Workflows**: Automates incremental data ingestion based on specified columns, using where clauses for partitioned ingestion.
+9. **Data Validation**: Performs row counts, DDL matching, and data sampling, storing results in a QA log table.
+10. **Data Type Mapping**: Matches external data types to appropriate Hadoop data types, handling specific cases like Oracle's NUMBER type.
+11. **Isolated Environments**: Provides separate team spaces for source tables, allowing independent workflow generation and scheduling.
+
+## Command-line Interface
+
+IBIS provides a comprehensive command-line interface. To view all available functionalities, use:
+
+```
+./ibis-shell --help
+```
+
+For detailed information on each command, refer to the [IBIS Help Documentation](/docs/help.md).
 
 ## Architecture
 
